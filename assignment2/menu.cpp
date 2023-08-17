@@ -116,7 +116,7 @@ void Menu::startNewGame() {
     std::cout << "Starting A New Game" << std::endl;
     std::cout << std::endl;
 
-    std::string p1Name, p2Name;
+    std::string p1Name, p2Name, p3Name, p4Name;
 
     std::cout << "Enter A Name For Player 1 (uppercase characters only)" << std::endl;
     std::cout << "> ";
@@ -188,7 +188,7 @@ void Menu::startNewGame() {
         std::cout << "Lets Play!" << std::endl;
 
         try {
-            GameController* gc = new GameController(p1Name, p2Name, enhancementsOn);
+            GameController* gc = new GameController(p1Name, p2Name, p3Name, p4Name, enhancementsOn);
             gc->prepareGame();
             delete gc;
         }
@@ -295,19 +295,10 @@ void Menu::startEnhancedNewGame() {
         std::cout << "Lets Play!" << std::endl;
 
         try {
-            GameController* gc;
-            if (input == 2) {
-                gc = new GameController(p1Name, p2Name, enhancementsOn);
-                gc->prepareGame();
-                delete gc;
-            }
-            //     else if (input == 3 && !p3Name.empty()) {
-            //         gc = new GameController(p1Name, p2Name, p3Name, enhancementsOn);
-            //     }
-            //     else if (input == 4 && !p4Name.empty()) {
-            //         gc = new GameController(p1Name, p2Name, p3Name, p4Name, enhancementsOn);
-            //     }
 
+            GameController* gc = new GameController(p1Name, p2Name, p3Name, p4Name, enhancementsOn);
+            gc->prepareGame();
+            delete gc;
         }
         catch (const std::exception& e) {
             std::cerr << e.what() << std::endl;

@@ -10,6 +10,7 @@
 
 #define MAX_TILES   72
 #define START_GAME_TILEBAG_LENGTH 60
+#define ENHANCED_GAME_TILEBAG_LENGTH 48
 #define MAX_TILE_OCCURENCES 2
 #define PLACED_TILE_MAX_LENGTH 6
 #define QWIRKLE 6
@@ -24,13 +25,10 @@ class GameController {
 public:
 
   // Constructors / Destructors
-  GameController(std::string player1, std::string player2, bool enhancementsOn);
+  GameController(std::string player1, std::string player2, std::string player3, std::string player4, bool enhancementsOn);
   // Overloaded Constructor for loading game.
   GameController(Player* player1, Player* player2, Board* board, LinkedList* tileBag, LinkedList* playedTiles);
-  // Overloaded Constructor for 3 players for milestone 3.
-  GameController(std::string player1, std::string player2, std::string player3, bool enhancementsOn);
-  // Overloaded Constructor for 4 players for milestone 3.
-  GameController(std::string player1, std::string player2, std::string player3, std::string player4, bool enhancementsOn);
+
   ~GameController();
 
   // The function that prepares the game by creating the tilebag, dealing the player
@@ -122,6 +120,8 @@ public:
   // Generates a random in from a min to max level. Used in the creation of the tilebag.
   int generateRandomInt(int min, int max);
 
+  // Decides which player gets to play a turn first.
+  void decideFirstTurnPlayer();
 
 private:
 
@@ -133,8 +133,13 @@ private:
   Player* currPlayer;
 
   bool enhancementsOn;
+  int startTileAmount;
+  int noOfPlayers;
+
   Player* player3;
   Player* player4;
+
+
 
 };
 

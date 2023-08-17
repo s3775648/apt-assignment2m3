@@ -9,7 +9,13 @@
 #include <sstream>
 
 
-GameController::GameController(std::string player1, std::string player2, bool enhancementsOn) {
+GameController::GameController(std::string player1, std::string player2, std::string player3, std::string player4, bool enhancementsOn) {
+
+  this->player3 = nullptr;
+  this->player4 = nullptr;
+  this->enhancementsOn = enhancementsOn;
+  this->noOfPlayers = 2;
+  this->startTileAmount = 60;
 
   try {
 
@@ -18,14 +24,23 @@ GameController::GameController(std::string player1, std::string player2, bool en
     this->board = new Board(MAX_ROW, MAX_COL);
     this->tileBag = new LinkedList();
     this->playedTiles = new LinkedList();
+
+    if (!player3.empty()) {
+      this->player3 = new Player(player3);
+      this->noOfPlayers = 3;
+      this->startTileAmount = 54;
+    }
+
+    if (!player4.empty()) {
+      this->player4 = new Player(player4);
+      this->noOfPlayers = 4;
+      this->startTileAmount = 48;
+    }
+
   }
   catch (const std::exception& e) {
     std::cerr << e.what() << std::endl;
   }
-
-  this->player3 = nullptr;
-  this->player4 = nullptr;
-  this->enhancementsOn = enhancementsOn;
 }
 
 
@@ -68,8 +83,16 @@ void  GameController::prepareGame() {
   // Filling tile bag and player hands.
   createTileBag();
   setupHands();
+
+  // NEED TO IMPLEMENT LATER
+  //if (!enhancementsOn) {
   setCurrPlayer(player1);
-  // Needed to clear cin buffer for first turn only.
+  // }
+  // else if (enhancementsOn) {
+  //   decideFirstTurnPlayer();
+  // }
+
+   // Needed to clear cin buffer for first turn only.
   char randomInput;
   while ((randomInput = std::cin.get()) != '\n') {}
   playGame();
@@ -122,8 +145,28 @@ void  GameController::setupHands() {
     tileBag->removeFront();
   }
   for (int i = 0; i < FULL_HAND; i++) {
+
     player2->addToHand(tileBag->get(0));
     tileBag->removeFront();
+  }
+
+  // Update for milestone 3 for 3/4 player mode.
+  if (this->noOfPlayers >= 3) {
+
+    for (int i = 0; i < FULL_HAND; i++) {
+
+      player3->addToHand(tileBag->get(0));
+      tileBag->removeFront();
+    }
+  }
+
+  if (this->noOfPlayers == 4) {
+
+    for (int i = 0; i < FULL_HAND; i++) {
+
+      player4->addToHand(tileBag->get(0));
+      tileBag->removeFront();
+    }
   }
 }
 
@@ -132,7 +175,9 @@ void GameController::playGame() {
 
   bool eofReceived = false;
 
-  while (!eofReceived && (player1->getHand()->size() > 0 && player2->getHand()->size() > 0)) {
+  while (!eofReceived && ((this->noOfPlayers == 2 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0) ||
+    (this->noOfPlayers == 3 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0 && player3->getHand()->size() > 0) ||
+    (this->noOfPlayers == 4 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0 && player3->getHand()->size() > 0 && player4->getHand()->size() > 0))) {
 
     printTurn();
     eofReceived = takeInput();
@@ -154,6 +199,15 @@ void GameController::printTurn() {
 
   std::cout << "Score for " << this->player1->getName() << ": " << this->player1->getScore() << std::endl;
   std::cout << "Score for " << this->player2->getName() << ": " << this->player2->getScore() << std::endl;
+
+  if (this->noOfPlayers >= 3) {
+    std::cout << "Score for " << this->player3->getName() << ": " << this->player3->getScore() << std::endl;
+  }
+
+  if (this->noOfPlayers == 4) {
+    std::cout << "Score for " << this->player4->getName() << ": " << this->player4->getScore() << std::endl;
+  }
+
   std::cout << std::endl;
 
   if (!enhancementsOn) {
@@ -366,7 +420,7 @@ bool  GameController::placeTile(std::string tileCode, std::string location) {
       if (tile != nullptr) {
 
         // checks that isn't first turn
-        if (this->tileBag->size() < START_GAME_TILEBAG_LENGTH) {
+        if (this->tileBag->size() < this->startTileAmount) {
 
           LinkedList* northSouthLL = board->getTileList(row, col, "ns");
           LinkedList* eastWestLL = board->getTileList(row, col, "ew");
@@ -668,18 +722,45 @@ int GameController::calculateScore(LinkedList* ll) {
 
 void  GameController::endGame() {
 
+  Player* winner = this->player1;
+  bool draw = true;
+
   std::cout << "Game Over" << std::endl;
   std::cout << "Score for " << this->player1->getName() << ": " << this->player1->getScore() << std::endl;
   std::cout << "Score for " << this->player2->getName() << ": " << this->player2->getScore() << std::endl;
 
+  if (this->noOfPlayers >= 3) {
+    std::cout << "Score for " << this->player3->getName() << ": " << this->player3->getScore() << std::endl;
+  }
+
+  if (this->noOfPlayers == 4) {
+    std::cout << "Score for " << this->player4->getName() << ": " << this->player4->getScore() << std::endl;
+  }
+
   if (this->player1->getScore() > this->player2->getScore()) {
-    std::cout << "Player " << this->player1->getName() << " won!" << std::endl;
+    draw = false;
   }
-  else if (this->player1->getScore() < this->player2->getScore()) {
-    std::cout << "Player " << this->player2->getName() << " won!" << std::endl;
+
+  if (this->player2->getScore() > this->player1->getScore()) {
+    winner = this->player2;
+    draw = false;
   }
-  else if (this->player1->getScore() == this->player2->getScore()) {
+
+  if (this->noOfPlayers >= 3 && winner != nullptr && this->player3->getScore() > winner->getScore()) {
+    winner = this->player3;
+    draw = false;
+  }
+
+  if (this->noOfPlayers >= 4 && winner != nullptr && this->player4->getScore() > winner->getScore()) {
+    winner = this->player3;
+    draw = false;
+  }
+
+  if (draw) {
     std::cout << "It is a draw!" << std::endl;
+  }
+  else {
+    std::cout << "Player " << winner->getName() << " won!" << std::endl;
   }
 }
 
@@ -817,10 +898,33 @@ void GameController::setCurrPlayer(Player* player) {
 
 
 void GameController::changeCurrPlayer() {
+
   if (this->currPlayer == this->player1) {
+
     this->currPlayer = this->player2;
   }
-  else {
+  else if (this->currPlayer == this->player2) {
+
+    if (this->noOfPlayers == 2) {
+
+      this->currPlayer = this->player1;
+    }
+    else {
+      this->currPlayer = this->player3;
+    }
+  }
+  else if (this->currPlayer == this->player3) {
+
+    if (this->noOfPlayers == 3) {
+
+      this->currPlayer = this->player1;
+    }
+    else {
+      this->currPlayer = this->player4;
+    }
+  }
+  else if (this->currPlayer == this->player4) {
+
     this->currPlayer = this->player1;
   }
 }
@@ -834,3 +938,12 @@ int GameController::generateRandomInt(int min, int max) {
   return uniform_dist(engine);
 }
 
+
+void GameController::decideFirstTurnPlayer() {
+
+  // int maxNumberOfAttribute = 0;
+  // Player* firstPlayer;
+  for (int i = 0; i < player1->getHand()->size(); i++) {
+
+  }
+}
