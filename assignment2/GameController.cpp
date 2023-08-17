@@ -156,7 +156,13 @@ void GameController::printTurn() {
   std::cout << "Score for " << this->player2->getName() << ": " << this->player2->getScore() << std::endl;
   std::cout << std::endl;
 
-  this->board->printBoard(enhancementsOn);
+  if (!enhancementsOn) {
+    this->board->printBoard();
+  }
+  else if (enhancementsOn) {
+    this->board->printEnhancedBoard();
+  }
+
   std::cout << std::endl;
   std::cout << "Your hand is" << std::endl;
 

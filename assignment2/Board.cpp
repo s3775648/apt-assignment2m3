@@ -39,7 +39,7 @@ Board::Board(const Board& other) {
 }
 
 
-void Board::printBoard(bool enhanced) {
+void Board::printBoard() {
 
   // Prints the numbers across the top of the board
   for (int i = 0; i <= MAX_COL; i++) {
@@ -87,12 +87,7 @@ void Board::printBoard(bool enhanced) {
       // Prints tile if a tile has been played
       if (this->coordinates[i][j].getPlayedTile() != nullptr) {
 
-        if (!enhanced) {
-          std::cout << "" << this->coordinates[i][j].getPlayedTile()->getColour() << this->coordinates[i][j].getPlayedTile()->getShape();
-        }
-        else if (enhanced) {
-          std::cout << "" << this->coordinates[i][j].getPlayedTile()->getTileAsSymbol();
-        }
+        std::cout << "" << this->coordinates[i][j].getPlayedTile()->getColour() << this->coordinates[i][j].getPlayedTile()->getShape();
       }
       else {
         std::cout << "  ";
@@ -102,6 +97,67 @@ void Board::printBoard(bool enhanced) {
     std::cout << std::endl;
   }
 }
+
+
+void Board::printEnhancedBoard() {
+
+  // Prints the numbers across the top of the board
+  for (int i = 0; i <= MAX_COL; i++) {
+
+    if (i > 0 && i < 10) {
+
+      std::cout << "  " << i << " ";
+    }
+    else if (i >= 10) {
+
+      std::cout << " " << i << " ";
+    }
+    else {
+
+      std::cout << "   ";
+    }
+  }
+
+  std::cout << std::endl;
+
+  // Prints the line under the numbers at the top of the board
+  for (int i = 1; i < MAX_COL; i++) {
+
+    if (i % 3 == 0) {
+
+      std::cout << "-----";
+    }
+    else {
+
+      std::cout << "----";
+    }
+  }
+
+  std::cout << std::endl;
+
+  char y = 'A';
+  // Prints the board
+  for (int i = 0; i < MAX_ROW; i++) {
+    // Prints the char on the left side of the board
+    std::cout << y << "  |";
+    y++;
+
+    // Prints the board
+    for (int j = 0; j < MAX_COL; j++) {
+      // Prints tile if a tile has been played
+      if (this->coordinates[i][j].getPlayedTile() != nullptr) {
+
+        std::cout << " " << this->coordinates[i][j].getPlayedTile()->getTileAsSymbol() << " ";
+      }
+      else {
+        std::cout << "   ";
+      }
+      std::cout << "|";
+    }
+    std::cout << std::endl;
+  }
+}
+
 
 // Checks if board position has a tile played and returns a boolean result.
 bool Board::isBoardPositionEmpty(int row, int col) {

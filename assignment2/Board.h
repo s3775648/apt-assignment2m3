@@ -21,7 +21,10 @@ public:
   Board(const Board& other);
 
   // Prints the board out to terminal.
-  void printBoard(bool enhanced);
+  void printBoard();
+
+  // Prints Board with coloured symbols rather than tilecode. Milestone 3
+  void printEnhancedBoard();
 
   // This function is programming by contract. It is assumed that the caller of this function has
   // guaranteed that row and col fields passed amount to a valid coordinate.
