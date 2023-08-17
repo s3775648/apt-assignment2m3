@@ -44,15 +44,31 @@ GameController::GameController(std::string player1, std::string player2, std::st
 }
 
 
-GameController::GameController(Player* player1, Player* player2, Board* board, LinkedList* tileBag, LinkedList* playedTiles) {
+GameController::GameController(Player* player1, Player* player2, Player* player3, Player* player4, Board* board, LinkedList* tileBag, LinkedList* playedTiles, bool enhancementsOn) {
+
+  this->enhancementsOn = enhancementsOn;
+  this->noOfPlayers = 2;
+  this->startTileAmount = 60;
 
   try {
-
     this->player1 = player1;
     this->player2 = player2;
     this->board = board;
     this->tileBag = tileBag;
     this->playedTiles = playedTiles; // load played tiles
+
+
+    if (player3 != nullptr) {
+      this->player3 = player3;
+      this->noOfPlayers = 3;
+      this->startTileAmount = 54;
+    }
+
+    if (player4 != nullptr) {
+      this->player4 = player4;
+      this->noOfPlayers = 4;
+      this->startTileAmount = 48;
+    }
   }
   catch (const std::exception& e) {
     std::cerr << e.what() << std::endl;
@@ -174,6 +190,12 @@ void  GameController::setupHands() {
 void GameController::playGame() {
 
   bool eofReceived = false;
+
+  // std::cout << "what" << std::endl;
+  // this->player1->printHand();
+  // this->player2->printHand();
+  // this->player3->printHand();
+  // this->player4->printHand();
 
   while (!eofReceived && ((this->noOfPlayers == 2 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0) ||
     (this->noOfPlayers == 3 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0 && player3->getHand()->size() > 0) ||
@@ -564,80 +586,215 @@ void  GameController::saveGame(std::string fileName) {
   IOStream stream;
   std::string saveData = "";
 
-  // Player One Name
-  saveData += this->player1->getName();
-  saveData += '\n';
+  // format. Milestone 3
+  if (enhancementsOn) {
 
-  // Player One Score
-  saveData += std::to_string(this->player1->getScore());
-  saveData += '\n';
+    saveData += "s3775648";
+    saveData += '\n';
 
-  // Player One hand
-  for (int i = 0; i < this->player1->getHand()->size(); i++) {
+    // Board Shape
+    saveData += std::to_string(this->board->getRows()) + "," + std::to_string(this->board->getCols());
+    saveData += '\n';
 
-    saveData += this->player1->getHand()->get(i)->getColour();
-    saveData += std::to_string(this->player1->getHand()->get(i)->getShape());
-    saveData += ',';
-  }
+    // Board State
+    if (this->playedTiles->size() == 0) {
+      saveData += "0";
+    }
+    else {
+      saveData += this->board->getCoordinatesAsString();
+    }
 
-  // Remove trailing ','
-  saveData.resize(saveData.length() - 1);
-  saveData += '\n';
+    saveData += '\n';
 
-  // Player Two Name
-  saveData += this->player2->getName();
-  saveData += '\n';
+    // Board Tile Bag
+    if (this->tileBag->size() == 0) {
+      saveData += "0";
+    }
+    else {
+      for (int i = 0; i < this->tileBag->size(); i++) {
 
-  // Player Two Score
-  saveData += std::to_string(this->player2->getScore());
-  saveData += '\n';
+        saveData += tileBag->get(i)->getColour();
+        saveData += std::to_string(tileBag->get(i)->getShape());
+        saveData += ',';
+      }
+      // Remove trailing ','
+      saveData.resize(saveData.length() - 1);
+    }
 
-  // Player Two hand
-  for (int i = 0; i < this->player2->getHand()->size(); i++) {
+    saveData += '\n';
 
-    saveData += this->player2->getHand()->get(i)->getColour();
-    saveData += std::to_string(this->player2->getHand()->get(i)->getShape());
-    saveData += ',';
-  }
+    // Current Player Name
+    saveData += this->currPlayer->getName();
+    saveData += '\n';
 
-  // Remove trailing ','
-  saveData.resize(saveData.length() - 1);
-  saveData += '\n';
+    // Player One Name
+    saveData += this->player1->getName();
+    saveData += '\n';
 
-  // Board Shape
-  saveData += std::to_string(this->board->getRows()) + "," + std::to_string(this->board->getCols());
-  saveData += '\n';
+    // Player One Score
+    saveData += std::to_string(this->player1->getScore());
+    saveData += '\n';
 
-  // Board State
+    // Player One hand
+    for (int i = 0; i < this->player1->getHand()->size(); i++) {
 
-  if (this->playedTiles->size() == 0) {
-    saveData += "0";
-  }
-  else {
-    saveData += this->board->getCoordinatesAsString();
-  }
-
-  saveData += '\n';
-
-  // Board Tile Bag
-  if (this->tileBag->size() == 0) {
-    saveData += "0";
-  }
-  else {
-    for (int i = 0; i < this->tileBag->size(); i++) {
-
-      saveData += tileBag->get(i)->getColour();
-      saveData += std::to_string(tileBag->get(i)->getShape());
+      saveData += this->player1->getHand()->get(i)->getColour();
+      saveData += std::to_string(this->player1->getHand()->get(i)->getShape());
       saveData += ',';
     }
+
     // Remove trailing ','
     saveData.resize(saveData.length() - 1);
+    saveData += '\n';
+
+    // Player Two Name
+    saveData += this->player2->getName();
+    saveData += '\n';
+
+    // Player Two Score
+    saveData += std::to_string(this->player2->getScore());
+    saveData += '\n';
+
+    // Player Two hand
+    for (int i = 0; i < this->player2->getHand()->size(); i++) {
+
+      saveData += this->player2->getHand()->get(i)->getColour();
+      saveData += std::to_string(this->player2->getHand()->get(i)->getShape());
+      saveData += ',';
+    }
+
+    // Remove trailing ','
+    saveData.resize(saveData.length() - 1);
+    saveData += '\n';
+
+    if (this->noOfPlayers >= 3) {
+
+      // Player Three Name
+      saveData += this->player3->getName();
+      saveData += '\n';
+
+      // Player Three Score
+      saveData += std::to_string(this->player3->getScore());
+      saveData += '\n';
+
+      // Player Three hand
+      for (int i = 0; i < this->player3->getHand()->size(); i++) {
+
+        saveData += this->player3->getHand()->get(i)->getColour();
+        saveData += std::to_string(this->player3->getHand()->get(i)->getShape());
+        saveData += ',';
+      }
+
+      // Remove trailing ','
+      saveData.resize(saveData.length() - 1);
+      saveData += '\n';
+    }
+
+    if (this->noOfPlayers == 4) {
+
+      // Player Four Name
+      saveData += this->player4->getName();
+      saveData += '\n';
+
+      // Player Four Score
+      saveData += std::to_string(this->player4->getScore());
+      saveData += '\n';
+
+      // Player Four hand
+      for (int i = 0; i < this->player4->getHand()->size(); i++) {
+
+        saveData += this->player4->getHand()->get(i)->getColour();
+        saveData += std::to_string(this->player4->getHand()->get(i)->getShape());
+        saveData += ',';
+      }
+
+      // Remove trailing ','
+      saveData.resize(saveData.length() - 1);
+
+    }
+  }
+  else {
+
+    saveData += "Default";
+    saveData += '\n';
+
+    // Player One Name
+    saveData += this->player1->getName();
+    saveData += '\n';
+
+    // Player One Score
+    saveData += std::to_string(this->player1->getScore());
+    saveData += '\n';
+
+    // Player One hand
+    for (int i = 0; i < this->player1->getHand()->size(); i++) {
+
+      saveData += this->player1->getHand()->get(i)->getColour();
+      saveData += std::to_string(this->player1->getHand()->get(i)->getShape());
+      saveData += ',';
+    }
+
+    // Remove trailing ','
+    saveData.resize(saveData.length() - 1);
+    saveData += '\n';
+
+    // Player Two Name
+    saveData += this->player2->getName();
+    saveData += '\n';
+
+    // Player Two Score
+    saveData += std::to_string(this->player2->getScore());
+    saveData += '\n';
+
+    // Player Two hand
+    for (int i = 0; i < this->player2->getHand()->size(); i++) {
+
+      saveData += this->player2->getHand()->get(i)->getColour();
+      saveData += std::to_string(this->player2->getHand()->get(i)->getShape());
+      saveData += ',';
+    }
+
+    // Remove trailing ','
+    saveData.resize(saveData.length() - 1);
+    saveData += '\n';
+
+    // Board Shape
+    saveData += std::to_string(this->board->getRows()) + "," + std::to_string(this->board->getCols());
+    saveData += '\n';
+
+    // Board State
+
+    if (this->playedTiles->size() == 0) {
+      saveData += "0";
+    }
+    else {
+      saveData += this->board->getCoordinatesAsString();
+    }
+
+    saveData += '\n';
+
+    // Board Tile Bag
+    if (this->tileBag->size() == 0) {
+      saveData += "0";
+    }
+    else {
+      for (int i = 0; i < this->tileBag->size(); i++) {
+
+        saveData += tileBag->get(i)->getColour();
+        saveData += std::to_string(tileBag->get(i)->getShape());
+        saveData += ',';
+      }
+      // Remove trailing ','
+      saveData.resize(saveData.length() - 1);
+    }
+
+    saveData += '\n';
+
+    // Current Player Name
+    saveData += this->currPlayer->getName();
+
   }
 
-  saveData += '\n';
-
-  // Current Player Name
-  saveData += this->currPlayer->getName();
 
   // Save the game
   try

@@ -27,7 +27,7 @@ public:
   // Constructors / Destructors
   GameController(std::string player1, std::string player2, std::string player3, std::string player4, bool enhancementsOn);
   // Overloaded Constructor for loading game.
-  GameController(Player* player1, Player* player2, Board* board, LinkedList* tileBag, LinkedList* playedTiles);
+  GameController(Player* player1, Player* player2, Player* player3, Player* player4, Board* board, LinkedList* tileBag, LinkedList* playedTiles, bool enhancementsOn);
 
   ~GameController();
 

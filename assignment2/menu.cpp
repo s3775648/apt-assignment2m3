@@ -391,166 +391,385 @@ bool Menu::loadGame() {
     if (!eofReceived) {
 
         //load game from file here, whilst also checking if filename is valid.
-
         IOStream load = IOStream();
         std::string game = load.loadGame(save);
 
         std::stringstream stream;
         stream.str(game);
 
-        // Create Player One
+        std::string saveType;
+        stream >> saveType;
 
-        std::string p1Name, p2Name;
-        stream >> p1Name;
+        if (saveType == "s3775648") {
 
-        int p1Score;
-        stream >> p1Score;
+            this->enhancementsOn = true;
 
-        std::string hand;
-        stream >> hand;
+            // Get Board Size and create board
+            std::string boardSize;
+            stream >> boardSize;
 
-        std::stringstream stream2;
-        stream2.str(hand);
+            std::stringstream boardSizeStream;
+            boardSizeStream.str(boardSize);
+            int boardRow;
+            std::string row;
+            std::getline(boardSizeStream, row, ',');
+            boardRow = stoi(row);
+            int boardCol;
+            boardSizeStream >> boardCol;
 
-        LinkedList* p1Hand = new LinkedList;
+            std::string boardState;
+            stream >> boardState;
 
-        std::string hand1;
-        while (std::getline(stream2, hand1, ','))
-        {
-            char colour = std::toupper(hand1[0]);
-            int shape = hand1[1] - '0';
+            Board* board = new Board(boardRow, boardCol);
 
-            Tile* tile = new Tile(shape, colour);
-            p1Hand->addBack(tile);
-            delete tile;
-        }
+            LinkedList* playedTiles = new LinkedList();
+            if (boardState != "0") {
 
-        Player* p1 = new Player(p1Name, p1Hand, p1Score);
-
-        // Create Player Two
-
-        stream >> p2Name;
-
-        int p2Score;
-        stream >> p2Score;
-
-        std::string hand2;
-        stream >> hand2;
-
-        std::stringstream stream3;
-        stream3.str(hand2);
-
-        LinkedList* p2Hand = new LinkedList;
-
-        std::string hand3;
-        while (std::getline(stream3, hand3, ','))
-        {
-            char colour = std::toupper(hand3[0]);
-            int shape = hand3[1] - '0';
-
-            Tile* tile = new Tile(shape, colour);
-            p2Hand->addBack(tile);
-            delete tile;
-        }
-
-        Player* p2 = new Player(p2Name, p2Hand, p2Score);
-
-        // Get Board Size and create board
-
-        std::string boardSize;
-        stream >> boardSize;
-
-        std::stringstream boardSizeStream;
-        boardSizeStream.str(boardSize);
-        int boardRow;
-        std::string row;
-        std::getline(boardSizeStream, row, ',');
-        boardRow = stoi(row);
-        int boardCol;
-        boardSizeStream >> boardCol;
-
-        std::string boardState;
-        stream >> boardState;
-
-        Board* board = new Board(boardRow, boardCol);
-
-        LinkedList* playedTiles = new LinkedList();
-        if (boardState != "0") {
-
-            std::stringstream boardStateStream;
-            boardStateStream.str(boardState);
+                std::stringstream boardStateStream;
+                boardStateStream.str(boardState);
 
 
-            // Load Board State
-            std::string state;
+                // Load Board State
+                std::string state;
 
-            while (std::getline(boardStateStream, state, ','))
-            {
-                if (state.size() <= 2)
-                {
+                while (std::getline(boardStateStream, state, ',')) {
+                    if (state.size() <= 2) {
 
+                    }
+                    else {
+                        char colour = std::toupper(state[0]);
+                        int shape = state[1] - '0';
+
+                        Tile* tile = new Tile(shape, colour);
+
+                        int row = state[3] - ASCII;
+                        int col = (stoi(state.substr(4)) - 1);
+
+                        board->setTile(row, col, tile);
+                        playedTiles->addBack(tile);
+                    }
                 }
-                else
-                {
-                    char colour = std::toupper(state[0]);
-                    int shape = state[1] - '0';
+            }
+
+            // Create/Load Tile Bag
+            std::string tempTileBag;
+            stream >> tempTileBag;
+            std::stringstream tileBagStream;
+            tileBagStream.str(tempTileBag);
+
+            LinkedList* tileBag = new LinkedList();
+            if (tempTileBag != "0") {
+
+                std::string tempTile;
+
+                while (std::getline(tileBagStream, tempTile, ',')) {
+                    char colour = std::toupper(tempTile[0]);
+                    int shape = tempTile[1] - '0';
 
                     Tile* tile = new Tile(shape, colour);
 
-                    int row = state[3] - ASCII;
-                    int col = (stoi(state.substr(4)) - 1);
-
-                    board->setTile(row, col, tile);
-                    playedTiles->addBack(tile);
+                    tileBag->addBack(tile);
+                    delete tile;
                 }
             }
-        }
 
-        // Create/Load Tile Bag
+            std::string currentPlayer;
+            stream >> currentPlayer;
 
-        std::string tempTileBag;
-        stream >> tempTileBag;
-        std::stringstream tileBagStream;
-        tileBagStream.str(tempTileBag);
 
-        LinkedList* tileBag = new LinkedList();
-        if (tempTileBag != "0") {
+            // Create Player One
+            std::string p1Name, p2Name, p3Name, p4Name;
+            stream >> p1Name;
 
-            std::string tempTile;
+            int p1Score;
+            stream >> p1Score;
 
-            while (std::getline(tileBagStream, tempTile, ','))
+            std::string hand;
+            stream >> hand;
+
+            std::stringstream stream2;
+            stream2.str(hand);
+
+            LinkedList* p1Hand = new LinkedList;
+
+            std::string hand1;
+            while (std::getline(stream2, hand1, ','))
             {
-                char colour = std::toupper(tempTile[0]);
-                int shape = tempTile[1] - '0';
+                char colour = std::toupper(hand1[0]);
+                int shape = hand1[1] - '0';
 
                 Tile* tile = new Tile(shape, colour);
-
-                tileBag->addBack(tile);
+                p1Hand->addBack(tile);
                 delete tile;
             }
+
+            Player* p1 = new Player(p1Name, p1Hand, p1Score);
+
+            // Create Player Two
+            stream >> p2Name;
+
+            int p2Score;
+            stream >> p2Score;
+
+            std::string hand2;
+            stream >> hand2;
+
+            std::stringstream stream3;
+            stream3.str(hand2);
+
+            LinkedList* p2Hand = new LinkedList;
+
+            std::string hand3;
+            while (std::getline(stream3, hand3, ','))
+            {
+                char colour = std::toupper(hand3[0]);
+                int shape = hand3[1] - '0';
+
+                Tile* tile = new Tile(shape, colour);
+                p2Hand->addBack(tile);
+                delete tile;
+            }
+
+            Player* p2 = new Player(p2Name, p2Hand, p2Score);
+            Player* p3 = nullptr;
+            Player* p4 = nullptr;
+
+            // Create Player Three
+            if (stream >> p3Name) {
+
+                int p3Score;
+                stream >> p3Score;
+
+                std::string hand4;
+                stream >> hand4;
+
+                std::stringstream stream4;
+                stream4.str(hand4);
+
+                LinkedList* p3Hand = new LinkedList;
+
+                std::string hand5;
+                while (std::getline(stream4, hand5, ','))
+                {
+                    char colour = std::toupper(hand5[0]);
+                    int shape = hand5[1] - '0';
+
+                    Tile* tile = new Tile(shape, colour);
+                    p3Hand->addBack(tile);
+                    delete tile;
+                }
+
+                p3 = new Player(p3Name, p3Hand, p3Score);
+
+                // Create Player Four
+                if (stream >> p4Name) {
+
+                    int p4Score;
+                    stream >> p4Score;
+
+                    std::string hand6;
+                    stream >> hand6;
+
+                    std::stringstream stream5;
+                    stream4.str(hand6);
+
+                    LinkedList* p4Hand = new LinkedList;
+
+                    std::string hand7;
+                    std::cout << "in p4 load" << std::endl;
+                    std::cout << "hand7: " << hand7 << std::endl;
+                    while (std::getline(stream5, hand7, ','))
+                    {
+                        char colour = std::toupper(hand7[0]);
+                        int shape = hand7[1] - '0';
+
+                        Tile* tile = new Tile(shape, colour);
+                        p4Hand->addBack(tile);
+                        delete tile;
+                    }
+
+                    p4 = new Player(p4Name, p4Hand, p4Score);
+
+                }
+            }
+
+            GameController* gc = new GameController(p1, p2, p3, p4, board, tileBag, playedTiles, this->enhancementsOn);
+
+            if (p1->getName() == currentPlayer) {
+                gc->setCurrPlayer(p1);
+            }
+            else if (p2->getName() == currentPlayer) {
+                gc->setCurrPlayer(p2);
+            }
+            else if (p3->getName() == currentPlayer) {
+                gc->setCurrPlayer(p3);
+            }
+            else {
+                gc->setCurrPlayer(p4);
+            }
+
+            // Needed to clear cin buffer for first turn only.
+            char randomInput;
+            while ((randomInput = std::cin.get()) != '\n') {}
+            std::cout << "Qwirkle game successfully loaded" << std::endl;
+            gc->playGame();
+            delete gc;
+
         }
+        else {
 
-        std::string currentPlayer;
-        stream >> currentPlayer;
+            // Create Player One
+            std::string p1Name, p2Name;
+            stream >> p1Name;
 
-        GameController* gc = new GameController(p1, p2, board, tileBag, playedTiles);
+            int p1Score;
+            stream >> p1Score;
 
-        if (p1->getName() == currentPlayer)
-        {
-            gc->setCurrPlayer(p1);
+            std::string hand;
+            stream >> hand;
+
+            std::stringstream stream2;
+            stream2.str(hand);
+
+            LinkedList* p1Hand = new LinkedList;
+
+            std::string hand1;
+            while (std::getline(stream2, hand1, ','))
+            {
+                char colour = std::toupper(hand1[0]);
+                int shape = hand1[1] - '0';
+
+                Tile* tile = new Tile(shape, colour);
+                p1Hand->addBack(tile);
+                delete tile;
+            }
+
+            Player* p1 = new Player(p1Name, p1Hand, p1Score);
+
+            // Create Player Two
+            stream >> p2Name;
+
+            int p2Score;
+            stream >> p2Score;
+
+            std::string hand2;
+            stream >> hand2;
+
+            std::stringstream stream3;
+            stream3.str(hand2);
+
+            LinkedList* p2Hand = new LinkedList;
+
+            std::string hand3;
+            while (std::getline(stream3, hand3, ','))
+            {
+                char colour = std::toupper(hand3[0]);
+                int shape = hand3[1] - '0';
+
+                Tile* tile = new Tile(shape, colour);
+                p2Hand->addBack(tile);
+                delete tile;
+            }
+
+            Player* p2 = new Player(p2Name, p2Hand, p2Score);
+
+            // Get Board Size and create board
+            std::string boardSize;
+            stream >> boardSize;
+
+            std::stringstream boardSizeStream;
+            boardSizeStream.str(boardSize);
+            int boardRow;
+            std::string row;
+            std::getline(boardSizeStream, row, ',');
+            boardRow = stoi(row);
+            int boardCol;
+            boardSizeStream >> boardCol;
+
+            std::string boardState;
+            stream >> boardState;
+
+            Board* board = new Board(boardRow, boardCol);
+
+            LinkedList* playedTiles = new LinkedList();
+            if (boardState != "0") {
+
+                std::stringstream boardStateStream;
+                boardStateStream.str(boardState);
+
+
+                // Load Board State
+                std::string state;
+
+                while (std::getline(boardStateStream, state, ','))
+                {
+                    if (state.size() <= 2)
+                    {
+
+                    }
+                    else
+                    {
+                        char colour = std::toupper(state[0]);
+                        int shape = state[1] - '0';
+
+                        Tile* tile = new Tile(shape, colour);
+
+                        int row = state[3] - ASCII;
+                        int col = (stoi(state.substr(4)) - 1);
+
+                        board->setTile(row, col, tile);
+                        playedTiles->addBack(tile);
+                    }
+                }
+            }
+
+            // Create/Load Tile Bag
+            std::string tempTileBag;
+            stream >> tempTileBag;
+            std::stringstream tileBagStream;
+            tileBagStream.str(tempTileBag);
+
+            LinkedList* tileBag = new LinkedList();
+            if (tempTileBag != "0") {
+
+                std::string tempTile;
+
+                while (std::getline(tileBagStream, tempTile, ','))
+                {
+                    char colour = std::toupper(tempTile[0]);
+                    int shape = tempTile[1] - '0';
+
+                    Tile* tile = new Tile(shape, colour);
+
+                    tileBag->addBack(tile);
+                    delete tile;
+                }
+            }
+
+            std::string currentPlayer;
+            stream >> currentPlayer;
+
+            Player* p3 = nullptr;
+            Player* p4 = nullptr;
+
+            GameController* gc = new GameController(p1, p2, p3, p4, board, tileBag, playedTiles, this->enhancementsOn);
+
+            if (p1->getName() == currentPlayer)
+            {
+                gc->setCurrPlayer(p1);
+            }
+            else
+            {
+                gc->setCurrPlayer(p2);
+            }
+
+            // Needed to clear cin buffer for first turn only.
+            char randomInput;
+            while ((randomInput = std::cin.get()) != '\n') {}
+            std::cout << "Qwirkle game successfully loaded" << std::endl;
+            gc->playGame();
+            delete gc;
         }
-        else
-        {
-            gc->setCurrPlayer(p2);
-        }
-
-        // Needed to clear cin buffer for first turn only.
-        char randomInput;
-        while ((randomInput = std::cin.get()) != '\n') {}
-        std::cout << "Qwirkle game successfully loaded" << std::endl;
-        gc->playGame();
-        delete gc;
-
     }
     return eofReceived;
 }
