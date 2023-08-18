@@ -191,12 +191,7 @@ void GameController::playGame() {
 
   bool eofReceived = false;
 
-  // std::cout << "what" << std::endl;
-  // this->player1->printHand();
-  // this->player2->printHand();
-  // this->player3->printHand();
-  // this->player4->printHand();
-
+  // move this to bool function
   while (!eofReceived && ((this->noOfPlayers == 2 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0) ||
     (this->noOfPlayers == 3 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0 && player3->getHand()->size() > 0) ||
     (this->noOfPlayers == 4 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0 && player3->getHand()->size() > 0 && player4->getHand()->size() > 0))) {
