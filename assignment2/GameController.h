@@ -123,6 +123,9 @@ public:
   // Decides which player gets to play a turn first.
   void decideFirstTurnPlayer();
 
+  // Determines if any of the players hands are empty and if so returns false
+  bool shouldGameContinue();
+
 private:
 
   LinkedList* tileBag;
