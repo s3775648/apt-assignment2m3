@@ -1099,3 +1099,18 @@ void GameController::decideFirstTurnPlayer() {
 
   }
 }
+
+bool GameController::ShouldGameContinue() {
+  
+  bool continuePlay = true;
+  
+   if ((this->noOfPlayers == 2 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0) ||
+    (this->noOfPlayers == 3 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0 && player3->getHand()->size() > 0) ||
+    (this->noOfPlayers == 4 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0 && player3->getHand()->size() > 0 && player4->getHand()->size() > 0))) {
+        
+        continuePlay = false;
+    }
+    
+    return continuePlay;
+
+}
