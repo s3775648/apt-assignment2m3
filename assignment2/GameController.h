@@ -120,9 +120,6 @@ public:
   // Generates a random in from a min to max level. Used in the creation of the tilebag.
   int generateRandomInt(int min, int max);
 
-  // Decides which player gets to play a turn first.
-  void decideFirstTurnPlayer();
-
   // Determines if any of the players hands are empty and if so returns false
   bool shouldGameContinue();
 
@@ -141,8 +138,6 @@ private:
 
   Player* player3;
   Player* player4;
-
-
 
 };
 

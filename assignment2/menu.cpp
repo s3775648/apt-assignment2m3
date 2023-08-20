@@ -317,7 +317,7 @@ bool Menu::loadGame() {
         std::ifstream file(save);
 
         if (file.fail()) {
-            std::cerr << "Error: can't find file" << std::endl;
+            std::cout << "Error: can't find file" << std::endl;
             validFileName = false;
         }
 

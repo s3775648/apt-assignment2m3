@@ -41,8 +41,6 @@ public:
     bool printCredits();
 
 
-
-
 private:
 
     bool enhancementsOn;

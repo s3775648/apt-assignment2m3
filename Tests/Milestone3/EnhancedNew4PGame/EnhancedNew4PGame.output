@@ -1,0 +1,37 @@
+Welcome to Qwirkle!
+-------------------
+Menu
+-----
+1. New Game
+2. Load Game
+3. Credits (Show Student Information)
+4. Turn Enhancements On
+5. Quit
+> 4
+Enhancements Turned On
+
+Menu
+-----
+1. New Game
+2. Load Game
+3. Credits (Show Student Information)
+4. Turn Enhancements Off
+5. Quit
+> 1
+Starting A New Game With Enhancements On
+
+How many players will be playing today? (between 2-4 players)
+> 4
+Enter A Name For Player 1 (uppercase characters only)
+> JOSH
+Enter A Name For Player 2 (uppercase characters only)
+> DAVE
+Enter A Name For Player 3 (uppercase characters only)
+> PULVI
+Enter A Name For Player 4 (uppercase characters only)
+> JACK
+Player 1's Name = JOSH
+Player 2's Name = DAVE
+Player 3's Name = PULVI
+Player 4's Name = JACK
+Lets Play!

@@ -99,16 +99,9 @@ void  GameController::prepareGame() {
   // Filling tile bag and player hands.
   createTileBag();
   setupHands();
-
-  // NEED TO IMPLEMENT LATER
-  //if (!enhancementsOn) {
   setCurrPlayer(player1);
-  // }
-  // else if (enhancementsOn) {
-  //   decideFirstTurnPlayer();
-  // }
 
-   // Needed to clear cin buffer for first turn only.
+  // Needed to clear cin buffer for first turn only.
   char randomInput;
   while ((randomInput = std::cin.get()) != '\n') {}
   playGame();
@@ -192,7 +185,7 @@ void GameController::playGame() {
   bool eofReceived = false;
 
   // move this to bool function
-  while (!eofReceived && ShouldGameContinue()) {
+  while (!eofReceived && shouldGameContinue()) {
 
     printTurn();
     eofReceived = takeInput();
@@ -278,7 +271,7 @@ bool GameController::takeInput() {
         validInput = replaceTile(command);
       }
       else {
-        std::cerr << "Replace command only takes one tile" << std::endl; // probs need better error messages
+        std::cerr << "Replace command only takes one tile" << std::endl;
       }
     }
     else if (equalsIgnoreCase(command, "place")) {
@@ -332,7 +325,7 @@ bool GameController::takeInput() {
     }
     else {
       if (!std::cin.eof()) {
-        std::cerr << "Invalid Command" << std::endl;
+        std::cout << "Invalid Command" << std::endl;
       }
     }
     if (!validInput) {
@@ -390,11 +383,11 @@ bool  GameController::replaceTile(std::string tileCode) {
           turnSuccess = true;
         }
         else {
-          std::cerr << "No more tiles in the tilebag" << std::endl;
+          std::cout << "No more tiles in the tilebag" << std::endl;
         }
       }
       else {
-        std::cerr << "Tile is not in players hand" << std::endl;
+        std::cout << "Tile is not in players hand" << std::endl;
       }
     }
     catch (const std::exception& e) {
@@ -559,7 +552,7 @@ bool GameController::checkValidMove(LinkedList* ll, Tile* tile) {
         tileCanBePlaced = true;
       }
       else {
-        std::cerr << "Illegal Move" << std::endl;
+        std::cout << "Illegal Move" << std::endl;
       }
     }
     else {
@@ -788,19 +781,13 @@ void  GameController::saveGame(std::string fileName) {
 
   }
 
-
   // Save the game
-  try
-  {
+  try {
     stream.saveGame(saveData, fileName);
   }
-  catch (const std::exception& e)
-  {
+  catch (const std::exception& e) {
     std::cerr << e.what() << '\n';
   }
-
-
-
 }
 
 
@@ -896,13 +883,13 @@ void  GameController::endGame() {
     draw = false;
   }
 
-  if (this->noOfPlayers >= 3 && winner != nullptr && this->player3->getScore() > winner->getScore()) {
+  if (this->noOfPlayers >= 3 && this->player3->getScore() > winner->getScore()) {
     winner = this->player3;
     draw = false;
   }
 
-  if (this->noOfPlayers >= 4 && winner != nullptr && this->player4->getScore() > winner->getScore()) {
-    winner = this->player3;
+  if (this->noOfPlayers >= 4 && this->player4->getScore() > winner->getScore()) {
+    winner = this->player4;
     draw = false;
   }
 
@@ -1089,41 +1076,24 @@ int GameController::generateRandomInt(int min, int max) {
 }
 
 
-void GameController::decideFirstTurnPlayer() {
+bool GameController::shouldGameContinue() {
 
-  // int maxNumberOfAttribute = 0;
-  // Player* firstPlayer;
-  for (int i = 0; i < player1->getHand()->size(); i++) {
-
-  }
-}
-
-bool GameController::ShouldGameContinue() {
-  
   bool continuePlay = true;
-  
-if(player1->getHand()->size <= 0 || player2->getHand()->size <= 0) {
-    
-    continuePlay = false;
-}
 
-if (this->noOfPlayers >= 3 && this->player3->getHand()->size <= 0) {
-    
-    continuePlay = false;
-}
+  if (this->player1->getHand()->size() <= 0 || this->player2->getHand()->size() <= 0) {
 
-if (this->noOfPlayers == 4 && this->player4->getHand()->size() <= 0) {
-    
     continuePlay = false;
-}
- 
- //  if ((this->noOfPlayers == 2 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0) ||
-//    (this->noOfPlayers == 3 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0 && player3->getHand()->size() > 0) ||
- //   (this->noOfPlayers == 4 && player1->getHand()->size() > 0 && player2->getHand()->size() > 0 && player3->getHand()->size() > 0 && player4->getHand()->size() > 0))) {
-        
-    //    continuePlay = true;
- //   }
-    
-    return continuePlay;
+  }
 
+  if (this->noOfPlayers >= 3 && this->player3->getHand()->size() <= 0) {
+
+    continuePlay = false;
+  }
+
+  if (this->noOfPlayers == 4 && this->player4->getHand()->size() <= 0) {
+
+    continuePlay = false;
+  }
+
+  return continuePlay;
 }
